@@ -1,0 +1,128 @@
+﻿@using System.Security.Claims;
+@model FrituurAllRelationships.ViewModels.OrderWithOrderLineViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create your order</h1>
+
+<h4>Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!--Get Customer-->
+            @{
+                int? customerId = null;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId != null)
+                {
+                    customerId = int.Parse(userId);
+                }
+            }
+
+            <div class="form-group" style="display:none;">
+                <label asp-for="Order.CustomerId" class="control-label"></label>
+                <select asp-for="Order.CustomerId" class="form-control">
+                    <option value="@customerId"></option>
+                </select>
+            </div>
+
+            <h4>Order Lines</h4>
+
+            <div id="orderLines">
+                @for (int i = 0; i < Model.OrderLines.Count; i++)
+                {
+                    <div class="order-line">
+                        <div class="form-group">
+                            <label asp-for="@Model.OrderLines[i].ProductId" class="control-label">Product</label>
+                            <select asp-for="@Model.OrderLines[i].ProductId" class="form-control product-select" asp-items="ViewBag.ProductId">
+                                <option value="">Select Product</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="@Model.OrderLines[i].Amount" class="control-label">Amount</label>
+                            <input asp-for="@Model.OrderLines[i].Amount" class="form-control amount-input" type="number" min="0" />
+                            <span asp-validation-for="@Model.OrderLines[i].Amount" class="text-danger"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        <p></p>
+            <div class="form-group">
+                <button type="button" class="btn btn-secondary" id="addOrderLine">Add Order Line</button>
+            </div>
+
+            <hr>
+            <div class="form-group">
+                <label>Total Price: €<span id="totalPrice">0.00</span></label>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            let orderLineIndex = @Model.OrderLines.Count; 
+            const productPrices = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Products));  
+
+            // berekent de totaalprijs
+            function calculateTotalPrice() {
+                let totalPrice = 0;
+
+                $('.order-line').each(function (index, element) {
+                    const productId = $(element).find('select').val();
+                    const amount = parseFloat($(element).find('input').val()) || 0;
+
+                    if (productPrices[productId]) {
+                        totalPrice += productPrices[productId] * amount;
+                    }
+                });
+
+                $('#totalPrice').text(totalPrice.toFixed(2));
+            }
+
+            // voegt orderline toe
+            $('#addOrderLine').click(function () {
+                let newOrderLine = `
+                            <div class="order-line">
+                                <div class="form-group">
+                                    <label for="OrderLines_${orderLineIndex}__ProductId">Product</label>
+                                    <select name="OrderLines[${orderLineIndex}].ProductId" class="form-control product-select">
+                                    @foreach (var product in (SelectList)ViewBag.ProductId)
+                                    {
+                                                <option value="@product.Value">@product.Text</option>
+                                    }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="OrderLines_${orderLineIndex}__Amount">Amount</label>
+                                    <input type="number" name="OrderLines[${orderLineIndex}].Amount" class="form-control amount-input" type="number" min="0" />
+                                    <span class="text-danger" data-valmsg-for="OrderLines[${orderLineIndex}].Amount"></span>
+                                </div>
+                            </div>`;
+
+                $('#orderLines').append(newOrderLine);
+
+                orderLineIndex++;
+            });
+
+            // zorgt waneer de prijs berkent wordt
+            $('#orderLines').on('change', '.product-select, .amount-input', calculateTotalPrice);
+        });
+    </script>
+}

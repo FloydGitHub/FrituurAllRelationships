@@ -1,0 +1,72 @@
+﻿@model IEnumerable<FrituurAllRelationships.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Open orders from today</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Confirmed)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int orderCounter = 0;}  
+        @foreach (var item in Model)
+        {
+
+            
+            orderCounter++;
+            
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Customer.Username)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Confirmed)
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <form asp-action="Details" asp-route-id="@item.OrderId" class="me-1">
+                                <button type="submit" class="btn btn-primary btn-sm">Check order</button>
+                            </form>
+                            <form asp-action="ConfirmOrder" class="ms-1">
+                                <input type="hidden" name="id" value="@item.OrderId" />
+                                <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                
+            
+        }
+
+        
+        @if (orderCounter == 0)
+        {
+            <h2>There are currently no open orders from today</h2>
+        }
+    </tbody>
+</table>

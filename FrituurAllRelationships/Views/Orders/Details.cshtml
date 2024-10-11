@@ -1,0 +1,69 @@
+﻿@model FrituurAllRelationships.Models.Order
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Order Details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OrderDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OrderId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Customer.Username)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Confirmed)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Confirmed)
+        </dd>
+        @{
+            decimal totalPrice = 0;
+            int productCounter = 1;
+        }
+
+        @foreach (var orderLine in Model.OrderLines)
+        {
+            <dt class="col-sm-2">
+                Product @productCounter
+                @{
+                    productCounter++;
+                }
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => orderLine.Product.Name) -
+                Amount: @Html.DisplayFor(model => orderLine.Amount) -
+                Price: €@(orderLine.Amount * orderLine.Product.Price)
+
+                @{
+                    totalPrice += (orderLine.Amount * orderLine.Product.Price);
+                }
+            </dd>
+        }
+        <dt class="col-sm-2">Total Price</dt>
+        <dd class="col-sm-10">@totalPrice</dd>
+
+    </dl>
+</div>
+<div>
+    <p></p>
+    <form asp-action="Index">
+        <button type="submit" class="btn btn-primary">Back to List</button>
+    </form>
+</div>

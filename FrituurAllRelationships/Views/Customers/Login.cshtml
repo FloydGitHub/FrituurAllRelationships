@@ -1,0 +1,41 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Login";
+}
+@model FrituurAllRelationships.ViewModels.LoginViewModel
+
+<h2>Login</h2>
+<form asp-action="Login" method="post">
+    <div class="form-group">
+        <label asp-for="Username"></label>
+        <input asp-for="Username" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+    </div>
+    <p></p>
+    <button type="submit" class="btn btn-primary">Login</button>
+    <!--
+    <form asp-action="Logout">
+        <button type="submit" method="post" class="btn btn-danger btn-primary">Log Out</button>
+    </form>
+    -->
+    <p></p>
+    <form asp-action="Create">
+        <button type="submit" method="post" class="btn btn-success btn-primary">Create account</button>
+    </form>
+    <hr>
+    <b>Current logged in user:</b>
+    @{
+        var username = User.FindFirst(ClaimTypes.Name)?.Value;
+    }
+    @if (username != null)
+    {
+        <p>@username</p>
+    }
+    else
+    {
+        <p>No user is logged in</p>
+    }
+</form>

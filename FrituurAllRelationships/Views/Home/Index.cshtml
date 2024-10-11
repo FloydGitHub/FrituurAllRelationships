@@ -1,0 +1,26 @@
+﻿@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Hallo</h1>
+    <p>Welkom bij de website van frituur Het Neppertje</p>
+    <img src="PNG/Frietjes.png" alt="friet" height="80" width="100">
+    <p></p>
+    @{
+        var username = User.FindFirst(ClaimTypes.Name)?.Value; 
+    }
+
+    @if (username != null)
+    {
+        <p>@username is logged in</p>
+    }
+    else
+    {
+        <p>No user is logged in</p>
+    }
+</div>
+
+
